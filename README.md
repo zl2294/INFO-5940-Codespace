@@ -1,4 +1,7 @@
-# Quick Start the Codespace
+# INFO 5940 
+Welcome to the INFO 5940 repository. This guide walks you through setting up the development environment and running the test notebook.
+
+## Quick Start the Codespace
 1. Click the green **Code** button and switch to the **Codespaces** tab.  
 2. Select **Create Codespace**.
 3. Wait a few minutes for the environment to finish setting up. 
