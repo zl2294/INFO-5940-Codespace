@@ -20,5 +20,7 @@ Forking creates a personal copy of the repo under **your** GitHub account.
 ### Step 3: Verify your environment 
 Once the Codespace is ready: 
 1. Open `test.ipynb` in your codespace.
-2. In the top-right corner, click **Select Kernel** >> **Install** >> **Python environment** >> choose **Python 3.11.13 (first option)**.
+2. Install the Python 3.11.13 Kernel.  In the top-right corner, click **Select Kernel**.
+    1. If **Install/Enable suggested extensions Python + Jupyter** appears, select it, and wait for the install to finish before moving on to the next step.
+    2. Select **Python Environments** choose **Python 3.11.13 (first option)**.
 3. Run the first code block to check your setup. You should see `openai` import successfully.
