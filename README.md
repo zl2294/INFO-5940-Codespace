@@ -1,5 +1,5 @@
 # INFO 5940 
-Welcome to the INFO 5940 repository. You will complete your work using **GitHub Codespaces** and save your progress in your own GitHub repository. This guide will walk you through setting up the development environment and running the test notebook.  
+Welcome to the INFO 5940 repository. You will complete your work using [**GitHub Codespaces**](#about-github-codespaces) and save your progress in your own GitHub repository. This guide will walk you through setting up the development environment and running the test notebook.  
 
 ## Getting Started 
 
@@ -24,3 +24,15 @@ Once the Codespace is ready:
     1. If **Install/Enable suggested extensions Python + Jupyter** appears, select it, and wait for the install to finish before moving on to the next step.
     2. Select **Python Environments** choose **Python 3.11.13 (first option)**.
 3. Run the first code block to check your setup. You should see `openai` import successfully.
+
+## About GitHub Codespaces
+
+[Codespaces](https://docs.github.com/en/codespaces) is a complete software development and execution environment, running in the cloud, with its primary interface being a VSCode instance running in your browser.
+
+Codespaces is not free, but their per-month [free quota](https://docs.github.com/en/billing/concepts/product-billing/github-codespaces#free-quota) is generous.  Codespaces is free under the [GitHub Student Developer Pack](https://education.github.com/pack#github-codespaces).
+
+### Codespaces Tips
+
+* Codespaces keep running even when you close your browser (but will time out and stop after a while)
+* Unless you're on a free plan, or within your free quota, costs acrue while the codespace is running, whether or not you have it open in your browser or are working on it
+* You can control when it's running, and the space it takes up.  Check out [GitHub's codespaces lifecycle documentation](https://docs.github.com/en/codespaces/about-codespaces/understanding-the-codespace-lifecycle)
