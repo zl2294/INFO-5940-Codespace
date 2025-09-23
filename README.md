@@ -44,5 +44,44 @@ To make sure your personal forked repository stays up to date with the original 
 3. Click the **Sync fork** button.
 4. In the dropdown, choose **Update branch** to pull the latest changes from the original repo into your fork.
 
+Optionally, you can also follow these steps to create a new branch on your fork:
+1. Open your **forked repository** on GitHub.  
+2. At the top of the page, next to the branch dropdown, click the **Branches** button.  
+3. In the **Branches** view, click the green **New Branch** button.  
+4. In the popup window, enter a branch name.  
+   - You can use any name you like, but it’s recommended to match the branch name used in class for better organization.  
+5. Under **Branch source**, select:  
+   - **Repository:** `AyhamB/INFO-5940-Codespace`  
+   - **Branch:** choose the branch you want to sync from (e.g., `streamlit`).  
+6. Click the green **Create New Branch** button.  
+7. Verify that you’re now back in **your fork**, on the new branch you just created.  
+8. Click the **Code** button and create a new Codespace (if you don’t already have one).  
+   - Make sure the Codespace is created from the **current branch**.
+  
+## Running a Streamlit App on Codespaces  
+
+Follow these steps to launch and view your Streamlit app in GitHub Codespaces:
+
+1. **Open the terminal** inside your Codespace.  
+
+2. Run the command:  
+   ```bash
+   streamlit run your-file-name.py
+   ```  
+   *(Replace `your-file-name.py` with the actual name of your Streamlit app file, e.g., `hello_app.py`.)*  
+
+3. After pressing **Enter**, a popup should appear in the bottom-right corner of Codespace editor.  
+   - Click **“Open in Browser”** to view your app.  
+
+   ⚠️ *If you miss the popup:*  
+   - Press **Ctrl + C** in the terminal to stop the app.  
+   - Rerun the command from step 2 — the popup should appear again.  
+
+4. A new browser tab will open, showing the interface of your Streamlit app.  
+
+5. **Make changes to your code** in the Codespace editor.  
+   - Refresh the browser tab to see the updated version of your app.  
+
+
 ## Troubleshooting
 - The Jupyter extension should install automatically. If you still cannot select a Python kernel on Jupyter Notebook: Go to the left sidebar >> **Extensions** >> search for **Jupyter** >> reload window (or reinstall it).   
