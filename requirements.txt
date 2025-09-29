@@ -18,3 +18,6 @@ openpyxl
 beautifulsoup4
 pyarrow
 litellm
+protobuf==3.20.3
+pypdf>=4
+chromadb>=0.5
