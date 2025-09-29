@@ -21,7 +21,7 @@ if question and uploaded_file:
     file_content = uploaded_file.read().decode("utf-8")
     print(file_content)
     
-    client = OpenAI(api_key=environ['OPENAI_API_KEY'])
+    client = OpenAI
 
     # Append the user's question to the messages
     st.session_state.messages.append({"role": "user", "content": question})
