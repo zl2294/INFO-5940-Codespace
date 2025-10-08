@@ -1,6 +1,12 @@
 import streamlit as st
+import os
 from openai import OpenAI
 from os import environ
+
+client = OpenAI(
+	api_key=os.environ["API_KEY"],
+	base_url="https://api.ai.it.cornell.edu",
+)
 
 st.title("📝 File Q&A with OpenAI")
 uploaded_file = st.file_uploader("Upload an article", type=("txt", "md"))
@@ -20,8 +26,6 @@ if question and uploaded_file:
     # Read the content of the uploaded file
     file_content = uploaded_file.read().decode("utf-8")
     print(file_content)
-    
-    client = OpenAI()
 
     # Append the user's question to the messages
     st.session_state.messages.append({"role": "user", "content": question})
