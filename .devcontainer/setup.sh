@@ -8,7 +8,6 @@ sudo apt-get install -y \
     gcc \
 
 pip install -r requirements.txt
-
 ARCHFLAGS="-arch x86_64" pip install "chromadb>=0.5" langchain_chroma langgraph
 
 curl "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o "awscliv2.zip" \
