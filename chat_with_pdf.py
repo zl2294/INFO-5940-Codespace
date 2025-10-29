@@ -1,46 +1,158 @@
-import streamlit as st
 import os
-from openai import OpenAI
+import streamlit as st
+from typing import List
+
 from os import environ
+if not environ.get("OPENAI_API_KEY"):
+    environ["OPENAI_API_KEY"] = os.environ.get("API_KEY", "")
+if not environ.get("OPENAI_BASE_URL"):
+    environ["OPENAI_BASE_URL"] = "https://api.ai.it.cornell.edu"
 
-client = OpenAI(
-	api_key=os.environ["API_KEY"],
-	base_url="https://api.ai.it.cornell.edu",
+# LangChain model
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_chroma import Chroma
+
+# set up the Streamlit UI
+st.set_page_config(page_title="📝 RAG Chat", page_icon="💬")
+st.title("📝 Retrieval-Augmented Chat with Documents")
+
+PERSIST_DIR = "./chroma_db"
+COLLECTION = "docs"
+
+def get_vectorstore() -> Chroma:
+    if "vs" not in st.session_state:
+        embeddings = OpenAIEmbeddings(
+            model="openai.text-embedding-3-large",               
+            openai_api_key=environ["OPENAI_API_KEY"],       
+            openai_api_base=environ["OPENAI_BASE_URL"],          
+        )
+        st.session_state["vs"] = Chroma(
+            collection_name=COLLECTION,
+            embedding_function=embeddings,
+            persist_directory=PERSIST_DIR,
+        )
+    return st.session_state["vs"]
+
+# read txt file 
+def read_txt(f) -> Document:
+    text = f.read().decode("utf-8", errors="ignore")
+    return Document(page_content=text, metadata={"source": f.name})
+# read pdf file 
+def read_pdf(f) -> List[Document]:
+    try:
+        from pypdf import PdfReader
+    except Exception:
+        from PyPDF2 import PdfReader
+    reader = PdfReader(f)
+    out: List[Document] = []
+    for i, page in enumerate(reader.pages):
+        try:
+            text = page.extract_text() or ""
+        except Exception:
+            text = ""
+        out.append(Document(page_content=text, metadata={"source": f.name, "page": i + 1}))
+    return out
+
+def split_docs(docs: List[Document]) -> List[Document]:
+    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
+    return splitter.split_documents(docs)
+
+# can upload multiple file including txt and pdf 
+uploaded_files = st.file_uploader(
+    "Upload documents (.txt / .pdf)",
+    type=["txt", "pdf"],
+    accept_multiple_files=True,
 )
 
-st.title("📝 File Q&A with OpenAI")
-uploaded_file = st.file_uploader("Upload an article", type=("txt", "md"))
+if uploaded_files:
+    raw_docs: List[Document] = []
+    for f in uploaded_files:
+        name = f.name.lower()
+        if name.endswith(".txt"):
+            raw_docs.append(read_txt(f))
+        else:
+            raw_docs.extend(read_pdf(f))
 
-question = st.chat_input(
-    "Ask something about the article",
-    disabled=not uploaded_file,
-)
+    chunks = split_docs(raw_docs)
+    vs = get_vectorstore()
+    if chunks:
+        vs.add_documents(chunks) 
+    st.success(f"Indexed {len(uploaded_files)} files, {len(chunks)} chunks")
 
+# remember the history 
 if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "Ask something about the article"}]
+    st.session_state["messages"] = [
+        {"role": "assistant", "content": "Upload .txt/.pdf and ask a question. I will answer only from your documents."}
+    ]
 
-for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+for m in st.session_state["messages"]:
+    st.chat_message(m["role"]).write(m["content"])
 
-if question and uploaded_file:
-    # Read the content of the uploaded file
-    file_content = uploaded_file.read().decode("utf-8")
-    print(file_content)
+# LLM 
+llm = ChatOpenAI(
+    model="openai.gpt-4o",                     
+    temperature=0.2,
+    openai_api_key=environ["OPENAI_API_KEY"],
+    openai_api_base=environ["OPENAI_BASE_URL"],
+)
 
-    # Append the user's question to the messages
-    st.session_state.messages.append({"role": "user", "content": question})
-    st.chat_message("user").write(question)
+# ask question, retrievel and generated 
+def build_context(docs: List[Document]) -> str:
+    return "\n\n".join(d.page_content for d in docs)
+
+def lc_history_from_streamlit(history: List[dict]) -> List:
+    out = []
+    for m in history:
+        role = m.get("role")
+        content = m.get("content", "")
+        if role == "user":
+            out.append(HumanMessage(content=content))
+        elif role == "assistant":
+            out.append(AIMessage(content=content))
+    return out
+
+user_q = st.chat_input("Ask your question…")
+if user_q:
+    st.session_state["messages"].append({"role": "user", "content": user_q})
+    st.chat_message("user").write(user_q)
 
     with st.chat_message("assistant"):
-        stream = client.chat.completions.create(
-            model="gpt-4o",  # Change this to a valid model name
-            messages=[
-                {"role": "system", "content": f"Here's the content of the file:\n\n{file_content}"},
-                *st.session_state.messages
-            ],
-            stream=True
-        )
-        response = st.write_stream(stream)
+        try:
+            # retrivel 
+            vs = get_vectorstore()
+            retrieved = vs.as_retriever(search_kwargs={"k": 4}).invoke(user_q)
+            if not retrieved:
+                st.write("I don't know based on the provided documents.")
+                st.session_state["messages"].append({"role": "assistant", "content": "I don't know based on the provided documents."})
+                st.stop()
+            context = build_context(retrieved)
+            sys = SystemMessage(
+                content="You are a helpful assistant. Answer ONLY using the provided context. "
+                        "If the answer is not in the context, say you don't know. Be concise."
+            )
+            usr = HumanMessage(content=f"Question: {user_q}\n\nContext:\n{context}")
 
-    # Append the assistant's response to the messages
-    st.session_state.messages.append({"role": "assistant", "content": response})
+            messages = [sys, usr]
+
+            # generate 
+            result = llm.invoke(messages)
+            answer = result.content
+
+            # cited the source 
+            if retrieved:
+                cites = []
+                for d in retrieved:
+                    src = d.metadata.get("source", "")
+                    page = d.metadata.get("page")
+                    cites.append(f"{src}" + (f":p{page}" if page else ""))
+                cites = "; ".join(dict.fromkeys(cites))
+                answer += f"\n\nSources: {cites}"
+            st.write(answer)
+        except Exception as e:
+            answer = f"Error: {e}"
+            st.error(answer)
+
+    st.session_state["messages"].append({"role": "assistant", "content": answer})
