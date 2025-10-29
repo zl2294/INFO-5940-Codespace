@@ -16,8 +16,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 
 # set up the Streamlit UI
-st.set_page_config(page_title="📝 RAG Chat", page_icon="💬")
-st.title("📝 Retrieval-Augmented Chat with Documents")
+st.set_page_config(page_title="RAG Chat", page_icon="💬")
+st.title("📝 File Q&A with OpenAI")
 
 PERSIST_DIR = "./chroma_db"
 COLLECTION = "docs"
@@ -62,7 +62,7 @@ def split_docs(docs: List[Document]) -> List[Document]:
 
 # can upload multiple file including txt and pdf 
 uploaded_files = st.file_uploader(
-    "Upload documents (.txt / .pdf)",
+    "Upload documents with .txt or/and .pdf file",
     type=["txt", "pdf"],
     accept_multiple_files=True,
 )
@@ -85,7 +85,7 @@ if uploaded_files:
 # remember the history 
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
-        {"role": "assistant", "content": "Upload .txt/.pdf and ask a question. I will answer only from your documents."}
+        {"role": "assistant", "content": "I will answer the question based on your documents."}
     ]
 
 for m in st.session_state["messages"]:
@@ -114,7 +114,7 @@ def lc_history_from_streamlit(history: List[dict]) -> List:
             out.append(AIMessage(content=content))
     return out
 
-user_q = st.chat_input("Ask your question…")
+user_q = st.chat_input("How can I help you?")
 if user_q:
     st.session_state["messages"].append({"role": "user", "content": user_q})
     st.chat_message("user").write(user_q)
@@ -123,6 +123,7 @@ if user_q:
         try:
             # retrivel 
             vs = get_vectorstore()
+            # cosine similarity search via vector retriever
             retrieved = vs.as_retriever(search_kwargs={"k": 4}).invoke(user_q)
             if not retrieved:
                 st.write("I don't know based on the provided documents.")

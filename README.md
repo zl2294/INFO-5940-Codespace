@@ -1,6 +1,41 @@
 # INFO 5940 
 Welcome to the INFO 5940 repository. You will complete your work using [**GitHub Codespaces**](#about-github-codespaces) and save your progress in your own GitHub repository. This guide will walk you through setting up the development environment and running the test notebook.  
 
+# How to run 
+export API_KEY="your API"
+rm -rf ./chroma_db # optional, when the file document need to be clear 
+streamlit run chat_with_pdf.py
+
+# Application Overview
+1. user can upload one or multiple .txt and .pdf format, and it will be chunked
+2. the large filed would be chunk into different pieces
+3. ChromaDB vector retrieval for relevant content
+4. Store document embeddings in ChromaDB for vector search
+5. Retrieve the most relevant chunks using cosine similarity (top-k)
+6.Conversational chat interface with multi-turn history
+7.Assistant is restricted to respond only using the document content
+8. Includes source citation at the end of each answer for transparency
+
+
+# Configuration Changes
+only change the `requirements.txt` to support RAG capabilities:
+
+streamlit>=1.36
+openai>=1.14
+# LangChain
+langchain==0.3.27
+langchain-community==0.3.31
+langchain-openai==0.3.35
+langchain-chroma==0.1.4
+langchain-core==0.3.79
+# Vector Store + Embedding Storage
+chromadb>=0.5.0
+# PDF parsing
+pypdf>=4.0.0
+
+To support document vector storage and retrieval for the RAG system, the chromadb and langchain-chroma components have been added.These components are essential for the Chroma vector store within LangChain. To maintain compatibility with the existing Codespace environment, other dependencies remain unchanged.
+
+
 ## Getting Started 
 
 ### Step 1: Fork this repository 
