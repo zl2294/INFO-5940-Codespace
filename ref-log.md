@@ -1,1 +1,12 @@
+What did you learn from implementing a multi-agent workflow?
 
+Through building this two-agent travel planner, I learned how multi-agent collaboration can make AI outputs more reliable and realistic. The Planner focuses on generating a structured and creative itinerary, while the Reviewer acts like a real travel advisor who checks facts and improves feasibility. This project helped me understand how prompt design directly affects role behavior, the Planner needs clear creative boundaries, and the Reviewer needs strict validation logic. I also learned how important it is to balance creativity with realism by defining what each agent “can” and “cannot” do.
+
+Challenges faced and how you addressed them.
+The biggest challenge was handling realism versus imagination. For example, when the user wanted to explore “boba tea stores,” the Planner sometimes made up fake shop names. To fix this, I added rules that it can only include real or common brands like Kung Fu Tea or Tiger Sugar, and if not available, describe the experience in a general but realistic way like visit a nearby bubble tea shop. Another challenge was getting both agents to output in a consistent format. I solved that by defining shared Markdown structures, like “Quick Feasibility Summary” and “Delta List”, so the Reviewer’s feedback reads like a real report rather than random text.
+
+Any creative ideas, variations, or design choices (e.g., persona roles, prompt design).
+One creative idea I implemented was interest-aware personalization, which I called the “boba tea logic. When a user mentions specific interests like food or boba tea, the Planner automatically prioritizes those experiences in the itinerary. If real and well-known brands such as Kung Fu Tea or Tiger Sugar exist near the suggested locations, the Planner includes them; if not, it generates a realistic, generalized description like “visit a nearby bubble tea shop.” I also added a validation mirror in the Reviewer prompt so both sides follow the same logic — the Reviewer verifies whether those stores actually exist, checks price ranges, or provides alternatives when needed. The Reviewer can state assumptions when information can’t be confirmed online, which makes the collaboration more transparent and closer to how real teamwork would function.
+
+Note any external tools or GenAI assistance used and why.
+I only used OpenAI (GPT-based environment and Streamlit) for testing and debugging. No outside APIs besides the provided internet_search tool were used.
